@@ -1,37 +1,41 @@
 from datetime import datetime, timedelta, timezone
-from jose import jwt
-from passlib.context import CryptContext
-from authx import AuthX, AuthXConfig
+from fastapi.security import OAuth2PasswordBearer
+import jwt
 from src.config.settings import settings
-from src.db.models.user import User
-
-config = AuthXConfig()
-config.JWT_ACCESS_COOKIE_NAME = 'my_access_token'
-config.JWT_TOKEN_LOCATION = ['cookies']
-config.JWT_SECRET_KEY = settings.SECRET_KEY
-
-security = AuthX(config=config)
+from src.utils.security import verify_password
+from src.utils.users_methods import get_user_by_email
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 class AuthService:
     @staticmethod
-    def hash_password(password: str) -> str:
-        return pwd_context.hash(password)
-
-    @staticmethod
-    def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
-
-    @staticmethod
-    def create_access_token(user: User) -> str:
+    async def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now(timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+            
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM) # Кодируем данные
         
-        token = security.create_access_token(uid=str(user.id),
-                                            expiry=datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
-                                            data={"email": user.email,
-                                                  "roles": user.roles.split(","),
-                                                  })
-        return token
+        return encoded_jwt
     
+    
+    # Аунтефицируем пользователя
+    @staticmethod
+    async def authenticate_user(db, email: str, password: str):
+        user = await get_user_by_email(db, email)
+        if not user:
+            return False
+        if not verify_password(password, user.hashed_password):
+            return False
+        return user
+        

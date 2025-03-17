@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from src.routers import auth, users
-from src.db.session import engine, Base
 
 app = FastAPI()
 

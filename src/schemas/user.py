@@ -2,11 +2,12 @@ from pydantic import BaseModel, EmailStr
 
 
 class UserBase(BaseModel):
+    username: str
     email: EmailStr
+    roles: str | None = None
 
 class UserCreate(UserBase):
     password: str
-    roles: str | None = None
 
 
 class UserLogin(BaseModel):
@@ -14,7 +15,8 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserOut(UserBase):
+# Схема Пользователя в БД
+class UserInDB(UserBase):
     id: int
+    hashed_password: str
     is_active: bool
-    roles: str
