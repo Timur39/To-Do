@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # To-Do list (site)
 
 ### Stack:
@@ -12,6 +11,3 @@
   - JavaScript
   - HTML & CSS
   - Jinja2 templates
-=======
-To do list
->>>>>>> 1f31236369c17706519ffb62656e03e9c5719197
