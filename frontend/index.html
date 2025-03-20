@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <link rel="stylesheet" href="styles.css">
+    <title>Мой To-Do List</title>
+</head>
+<body>
+   <div class="filters">
+      <button class="filter-btn active" data-filter="all">Все</button>
+      <button class="filter-btn" data-filter="active">Активные</button>
+      <button class="filter-btn" data-filter="completed">Завершённые</button>
+   </div>
+    <!-- Контейнер для всего приложения -->
+    <div id="app">
+        <h1>Мой список дел</h1>
+        
+        <!-- Форма для добавления задач -->
+        <form id="task-form">
+            <input type="text" id="task-input" placeholder="Новая задача...">
+            <button type="submit">Добавить</button>
+        </form>
+
+        <!-- Список задач -->
+        <ul id="task-list"></ul>
+    </div>
+
+    <!-- Подключаем JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
+</html>
