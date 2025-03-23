@@ -49,3 +49,10 @@ async def delete_user_router(user_id: int, db: sessionDep, user: authDep_admin):
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found")
+
+
+@router.post("/test_users/{user_id}")
+async def test_users_router(user_id: int, db: sessionDep):
+    data = await UserMethods.select_users_with_condition_relationship_contais_eager(user_id, db)
+
+    return data

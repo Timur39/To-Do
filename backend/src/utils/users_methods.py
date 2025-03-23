@@ -1,8 +1,10 @@
 from sqlalchemy import delete, select
+from sqlalchemy.orm import joinedload, selectinload, contains_eager
 from src.db.models.user import UserModel
 from src.schemas.user import UserInDB, UserBase, UserCreate
 from src.dependencies.db import sessionDep
 from src.utils.security import hash_password
+from src.db.models.task import TaskModel
 from fastapi import HTTPException, status
 
 
@@ -97,3 +99,58 @@ class UserMethods:
         await db.execute(delete(UserModel.__table__))
         await db.commit()
 
+    
+    @staticmethod
+    async def select_users_with_selectin_relationship(user_id: int, db: sessionDep) -> list[TaskModel]:
+        query = (
+            select(UserModel).where(UserModel.id == user_id)
+            .options(selectinload(UserModel.tasks))
+        )
+
+        res = await db.execute(query)
+        result = res.unique().scalars().all()
+
+        user_tasks = result[0].tasks
+
+        return user_tasks
+    
+    
+    # @staticmethod
+    # async def select_users_with_condition_relationship(user_id: int, db: sessionDep) -> list[TaskModel]:
+    #     query = (
+    #         select(UserModel).where(UserModel.id == user_id)
+    #         .options(selectinload(UserModel.tasks_high_priotity))
+    #     )
+
+    #     res = await db.execute(query)
+    #     result = res.unique().scalars().all()
+
+    #     user_tasks = result[0].tasks_high_priotity
+
+    #     return user_tasks
+    
+
+    @staticmethod
+    async def select_users_with_condition_relationship_contais_eager(user_id: int, db: sessionDep) -> list[TaskModel]:
+        # subq = (
+        #     select(TaskModel.id.label("high_priority_task_id"))
+        #     .filter(TaskModel.user_id == UserModel.id)
+        #     .order_by(UserModel.id.desc())
+        #     .limit(1)
+        #     .scalar_subquery()
+        #     .correlate(UserModel)
+        # )   
+        query = (
+            select(UserModel).where(UserModel.id == user_id)
+            .join(UserModel.tasks)
+            .options(contains_eager(UserModel.tasks))
+            .filter(TaskModel.priority >= 2)
+        )
+
+        res = await db.execute(query)
+        result = res.unique().scalars().all()
+        if result:
+            user_tasks = result[0].tasks
+
+            return user_tasks
+    
