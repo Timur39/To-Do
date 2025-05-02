@@ -22,7 +22,12 @@ async def register(
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Создание пользователя
-    await UserMethods.create_user(user_data, db)
+    user = await UserMethods.create_user(user_data, db)
+    
+    raise HTTPException(status_code=status.HTTP_201_CREATED,
+                        detail=user)
+
+
 
 
 @router.post("/login", summary="Войти")

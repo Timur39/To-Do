@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import date
 
+# from src.schemas.user import UserInDB
+
 
 class Task(BaseModel):
     title: str | None = None
@@ -22,3 +24,7 @@ class TaskDelete(BaseModel):
 
 class TaskUpdate(Task):
     pass
+
+
+class TaskRel(Task):
+    user: "UserInDB"

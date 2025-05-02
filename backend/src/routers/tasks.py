@@ -40,7 +40,7 @@ async def update_task_router(task_id: int, new_data: TaskUpdate, db: sessionDep,
 
 @router.get("/get_all_tasks", summary="Получить все задачи")
 @cache(expire=60)
-async def get_all_tasks_router(db: sessionDep, user: authDep_user) -> list[Task]:
+async def get_all_tasks_router(db: sessionDep) -> list[Task]: # user: authDep_user
     tasks = await TaskMethods.get_all_tasks(db)
 
     return tasks

@@ -1,105 +1,31 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="html, css, portfolio, python-разработчик, python">
-    <meta name="description" content="Тимур Щипливцев - портфолио python-разработчика">
-    <title>My portfolio</title>
-    <link rel="stylesheet" href="index.css">
-
-
+    <meta name="description" content="Simple To-do list">
+    <meta name="keywords" content="To-do list, Simple To-do list, Pet-project">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="main.js" defer></script>
+    <title>To-do list</title>
 </head>
 <body>
-    <header id="header" class="header" >
-        <img src="https://creditorwatch.com.au/wp-content/uploads/2022/07/author-placeholder.png" 
-        alt="Картинка по HTML (url)" width="250">
-        <h1>Тимур Щипливцев</h1>
-        <p>
-            Я начинающий python-разработчик. Изучающий HTML & CSS
-        </p>
-    </header>
+    <div class="container">
+        <header class="header" id="header">
+            <h2>To-do List</h2>
+        </header>
 
-    <hr>
-
-    <article id="hobby" class="card hobby">
-        <h2>Мои хобби:</h2>
-        <ol>
-            <li>Спорт</li>
-            <li>Программирование</li>
-            <li>Компьютерные игры</li>
-            <li>Путешествия</li>
-        </ol>
-    </article>
-
-    <article id="work" class="card work">
-        <h2>Опыт работы</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Должность</th>
-                    <th>Год</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Sber</td>
-                    <td>CEO</td>
-                    <td>2014-2016</td>
-                </tr>
-                <tr>
-                    <td>Yandex</td>
-                    <td>Backend-developer</td>
-                    <td>2016-2020</td>
-                </tr>
-                <tr>
-                    <td>T-Bank</td>
-                    <td>Fullstack-developer</td>
-                    <td>2020-2025</td>
-                </tr>
-            </tbody>
-        </table>
-    </article>
-
-    <div id="form" class="form">
-        <h3>Связаться со мной</h3>
-        <form>
-            <div>
-                <label for="name_id">Ваше имя: </label>
-                <input type="text" id="name_id" placeholder="Введите имя">
+        <main class="main">
+            <div class="search-form">
+                <input type="text" id="title" placeholder="Добавить задачу...">
+                <button type="submit" id="create">Добавить</button>
             </div>
-            <div>
-                <label for="email_id">Ваш email: </label>
-                <input type="email" id="email_id" placeholder="Введите email">
+            <div class="tasks">
+                <h3>Все задачи</h3>
+                <ul id="list">
+                </ul>
             </div>
-            <div>
-                <label for="message">Ваше сообщение: </label>
-                <br>
-                <textarea id="message" cols="20" rows="5" 
-                placeholder="Введите сообщение..."></textarea>
-            </div>
-
-            <button>Отправить</button>
-        </form>
+        </main>
     </div>
-
-    <hr>
-
-    <footer id="footer" class="footer">
-        <nav id="navigation">
-            <h4>Список социальных сетей:</h4>
-            <p>
-                <a href="https://google.com", target="_blank">Google</a>
-                |
-                <a href="https://google.com">Github</a>
-                |
-                <a href="https://google.com">VK</a>
-            </p>
-        </nav>
-    </footer>
-
-    
-
 </body>
 </html>

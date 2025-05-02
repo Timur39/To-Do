@@ -4,6 +4,7 @@ from src.db.models.task import TaskModel
 from src.db.models.user import UserModel
 from src.schemas.task import Task, TaskCreate, TaskUpdate
 from src.dependencies.db import sessionDep
+from sqlalchemy.orm import joinedload, selectinload, contains_eager
 
 
 class TaskMethods:
@@ -66,28 +67,43 @@ class TaskMethods:
     # Получить все задачи
     @staticmethod
     async def get_all_tasks(db: sessionDep) -> list[Task]:
+        query = (
+                select(TaskModel)
+                .join(TaskModel.user)
+                .options(joinedload(TaskModel.user).load_only(UserModel.id, UserModel.username))
+                )
         if not await db.scalar(select(TaskModel)):
             raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail='Задач нет'
                         )
-        tasks = await db.execute(select(TaskModel))
-        tasks = tasks.scalars().all()   
+        tasks = await db.execute(query)
+        tasks = tasks.unique().scalars().all()   
 
         return tasks
 
     # Получить все задачи конкретного пользователя
     @staticmethod
     async def get_user_tasks(user_id: int, db: sessionDep) -> list[Task]:
-        tasks = await db.execute(select(TaskModel).where(TaskModel.user_id == user_id))
-        if not tasks:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail='Задач нет'
-                )
-        tasks = tasks.scalars().all()
+        query = (
+            select(UserModel).where(UserModel.id == user_id)
+            .join(UserModel.tasks)
+            .options(selectinload(UserModel.tasks))
+            # .filter(TaskModel.priority >= 2)
+            # .limit(10)
+        )
 
-        return tasks
+        res = await db.execute(query)
+        result = res.unique().scalars().all()
+
+        if result:
+            user_tasks = result[0].tasks
+
+            return [Task.model_validate(task, from_attributes=True) for task in user_tasks]
+        
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Задач нет')
+
     
     # Сбросить все задачи
     @staticmethod
