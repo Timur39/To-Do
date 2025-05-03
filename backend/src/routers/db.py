@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.db.session import setup_database
+from src.utils.db import setup_database
 from src.dependencies.auth import authDep_admin
 
 router = APIRouter(prefix='/db', tags=['Data base'])

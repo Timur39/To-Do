@@ -18,9 +18,3 @@ class TaskModel(Base):
     )
 
     repr_cols_num = 5
-
-    # __table_args__ = (
-    #     Index("title_index", "title"),
-    #     CheckConstraint("4 > priority > 0", name="check_priority_positive")
-    #     CheckConstraint("priority > 0", name="check_priority_positive")
-    # )

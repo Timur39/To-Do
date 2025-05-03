@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
 
-# from src.schemas.user import UserInDB
-
-
 class Task(BaseModel):
     title: str | None = None
     description: str  | None = None

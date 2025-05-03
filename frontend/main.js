@@ -1,6 +1,6 @@
 // browser-sync start --server --files "css/*.css *.js *.html"
-import { getTasks, login } from './api/auth.js';
-
+import { login, logout } from './api/auth.js';
+import { getTasks } from './api/tasks.js';
 
 const inputElement = document.getElementById('title')
 const createBtn = document.getElementById('create')
@@ -9,9 +9,7 @@ const listElement = document.getElementById('list')
 
 let tasks = []
 
-
 console.log(tasks);
-
 
 function render () {
     tasks = [getTasks()]
@@ -31,11 +29,11 @@ createBtn.onclick = ()  => {
     if (!inputElement.value) {
         return
     }
-    const newTask = {
-        title: inputElement.value,
-        is_completed: false
-    }
-    tasks.push(newTask)
+    // const newTask = {
+    //     title: inputElement.value,
+    //     is_completed: false
+    // }
+    // tasks.push(newTask) --> add db not in list
     render()
     inputElement.value = ''
 }
@@ -51,24 +49,18 @@ listElement.onclick = (event) => {
             tasks[index].is_completed = !tasks[index].is_completed
 
         } else if (type === 'remove') {
-            tasks.splice(index, 1)
+            // tasks.splice(index, 1) -> delete from db
         }
         render()
     }
-    
 }
 
 function getTaskTemplate(task, index) {
-    console.log(task);
-    
     return `
     <li>
-        <input type="checkbox" class="task-checkbox" data-index="${index}" data-type="toggle" ${task?.is_completed ? 'checked' : ''}>
+        <input type="checkbox" class="btn task-checkbox" data-index="${index}" data-type="toggle" ${task?.is_completed ? 'checked' : ''}>
         <span class="task-title" style="${task.is_completed ? 'text-decoration: line-through;' : ''}" >${task.title}</span>
-        <button class="delete-btn" data-index="${index}" data-type="remove">X</button>
+        <button class="btn delete-btn" data-index="${index}" data-type="remove">X</button>
     </li>
     `
 }
-
-
-

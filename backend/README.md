@@ -10,4 +10,4 @@
   - React
   - JavaScript
   - HTML & CSS
-  - Jinja2 templates
+  

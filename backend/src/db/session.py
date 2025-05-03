@@ -44,11 +44,3 @@ async def get_async_session():
     async with async_session_maker() as session:
         yield session
 
-# TODO: Убрать в utils
-async def setup_database() -> dict[str, str]:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-    return {'status': 'Database was successfully reset'}
-
-

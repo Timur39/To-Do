@@ -28,8 +28,6 @@ async def register(
                         detail=user)
 
 
-
-
 @router.post("/login", summary="Войти")
 async def login(
     user_data: Annotated[OAuth2PasswordRequestForm, Depends()],

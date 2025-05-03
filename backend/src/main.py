@@ -1,11 +1,9 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.routers import auth, users, tasks, db
-
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
-
 from redis import asyncio as aioredis
 
 
@@ -19,9 +17,8 @@ async def lifespan(app: FastAPI):
     app.include_router(users.router)
     app.include_router(tasks.router)
     app.include_router(db.router)
-
+    
     yield
-
 
 app = FastAPI(lifespan=lifespan,
               title="To-do app", 

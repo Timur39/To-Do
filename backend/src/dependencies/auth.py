@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.config.settings import settings
 from src.services.auth import oauth2_scheme
 
+
 # Получаем текущего пользователя
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], 
                            db: AsyncSession = Depends(get_async_session)) -> UserModel:
