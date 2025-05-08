@@ -7,7 +7,7 @@ from src.utils.tasks_methods import TaskMethods
 
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
-
+expire_time = 60
 
 @router.post("/create_task", summary="Создать задачу")
 async def create_task_router(task_data: TaskCreate, db: sessionDep, user: authDep_user) -> Task:
@@ -16,7 +16,7 @@ async def create_task_router(task_data: TaskCreate, db: sessionDep, user: authDe
 
 
 @router.get("/get_task_by_id/{task_id}", summary="Получить задачу по id")
-@cache(expire=60)
+@cache(expire=expire_time)
 async def get_task_by_id_router(task_id: int, db: sessionDep, user: authDep_user) -> Task:
     task = await TaskMethods.get_task_by_id(task_id, db)
     return task 
@@ -29,22 +29,24 @@ async def delete_task_router(task_id: int, db: sessionDep, user: authDep_user) -
 
 
 @router.post("/update_task/{task_id}", summary="Обновить задачу по id")
-async def update_task_router(task_id: int, new_data: TaskUpdate, db: sessionDep, user: authDep_user) -> Task:
+async def update_task_router(task_id: int, new_data: TaskUpdate, db: sessionDep) -> Task:
     updated_task = await TaskMethods.update_task_by_id(task_id, new_data, db)
     return updated_task
 
 
+
 @router.get("/get_all_tasks", summary="Получить все задачи")
-@cache(expire=60)
-async def get_all_tasks_router(db: sessionDep) -> list[Task]: # user: authDep_user
+@cache(expire=expire_time)
+async def get_all_tasks_router(db: sessionDep) -> list[Task]:
     all_tasks = await TaskMethods.get_all_tasks(db)
     return all_tasks
 
 
 @router.get("/get_user_tasks/{user_id}", summary="Получить все задачи у пользователя")
-@cache(expire=60)
+@cache(expire=expire_time)
 async def get_user_tasks_router(user_id: int, db: sessionDep, user: authDep_admin) -> list[Task]:
     user_tasks = await TaskMethods.get_user_tasks(user_id, db)
+
     return user_tasks
 
 

@@ -19,6 +19,7 @@ class TaskMethods:
         task = TaskModel(title=task_data.title,
                         description=task_data.description or None,
                         priority=task_data.priority or 0,
+                        is_completed=task_data.is_completed,
                         date=task_data.date,
                         user_id=user.id
                         )
@@ -38,13 +39,17 @@ class TaskMethods:
     # Удалить задачу по id
     @staticmethod
     async def delete_task_by_id(task_id: int, db: sessionDep) -> Task:
-        task = await db.get(TaskModel, task_id)
-        if not task:
-            raise task_not_found_exeption
-        await db.delete(task)
-        await db.commit()
+        try:
+            task = await db.get(TaskModel, task_id)
+            if not task:
+                raise task_not_found_exeption
+            await db.delete(task)
+            await db.commit()
 
-        return task
+            return task
+        except Exception as e:
+            print(f'Delete Task error: {e}')
+            return
 
     # Обновить задачу по id
     @staticmethod

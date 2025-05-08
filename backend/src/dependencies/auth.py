@@ -19,7 +19,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)],
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=[settings.ALGORITHM])  # Декодируем полученный токен
+        payload = jwt.decode(jwt=token, key=settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM])  # Декодируем полученный токен
         email = payload.get("sub")  # Получаем id из декодируемых данных
         if email is None:
             raise credentials_exception

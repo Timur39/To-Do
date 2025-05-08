@@ -130,3 +130,8 @@ body {
     margin-top: 20px;
     text-align: center;
 }
+
+.completed {
+    text-decoration: line-through;
+    opacity: 0.5;
+}

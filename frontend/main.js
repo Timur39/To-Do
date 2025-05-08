@@ -1,66 +1,92 @@
 // browser-sync start --server --files "css/*.css *.js *.html"
-import { login, logout } from './api/auth.js';
-import { getTasks } from './api/tasks.js';
+import { getTasks, addTask, deleteTask, updateTask } from './api/tasks.js';
 
-const inputElement = document.getElementById('title')
-const createBtn = document.getElementById('create')
-const listElement = document.getElementById('list')
-
-
+const inputElement = document.querySelector('#title')
+const createBtn = document.querySelector('#create')
+const listElement = document.querySelector('#list')
 let tasks = []
 
-console.log(tasks);
 
-function render () {
-    tasks = [getTasks()]
-    
+if (!localStorage.getItem('accessToken')) {
+    alert('Войдите в акаунт!')
+    window.location.href = '/frontend/auth/auth.html'
+}
+
+await fetchTasks()
+
+async function fetchTasks() {
+    tasks = await getTasks()
+    await renderTasks(tasks);
+}
+
+async function renderTasks(tasks) {
     listElement.innerHTML = ''
+
     if (tasks.length === 0) {
-        listElement.innerHTML = '<p>Нет элементов</p>'
-    }
-    for (let i = 0; i < tasks.length; i++) {
-        listElement.insertAdjacentHTML('beforeend', getTaskTemplate(tasks[i], i))
+        listElement.innerHTML = '<p>Нет задач</p>'
+    } else {
+        tasks.forEach(task => {
+            const li = document.createElement('li')
+
+            li.className = task.is_completed ? 'completed' : ''
+            li.innerHTML = getTaskTemplate(task)
+
+            li.querySelector('input').addEventListener('change', async () => {
+                try {
+                    await updateTask(task.id, {
+                        title: task.title,
+                        description: task.description,
+                        priority: task.priority,
+                        is_completed: !task.is_completed
+                    })
+                    li.classList.toggle('completed')
+                    task.is_completed = !task.is_completed
+                    await renderTasks(tasks)
+                } catch (error) {
+                    console.error('Update error:', error);
+                }
+            })
+
+            li.querySelector('.delete-btn').addEventListener('click', async () => {
+                await deleteTask(task.id)
+                tasks.pop(task)
+                li.remove()
+            })
+            listElement.appendChild(li)
+        })
     }
 }
 
-render()
-
-createBtn.onclick = ()  => {
+createBtn.addEventListener('click', async () => {
     if (!inputElement.value) {
         return
     }
-    // const newTask = {
-    //     title: inputElement.value,
-    //     is_completed: false
-    // }
-    // tasks.push(newTask) --> add db not in list
-    render()
+    const response = await addTask({
+        'title': inputElement.value.trim(),
+        'description': '',
+        'priority': 0,
+        'is_completed': false,
+        'date': new Date().toISOString().slice(0, 10)
+    })
     inputElement.value = ''
-}
+    const createdTask = await response.json()
+    createdTask['id'] = tasks[tasks.length - 1].id + 1
+    tasks.push(createdTask)
+
+    await renderTasks(tasks)
+})
+
+setInterval(() => {
+    localStorage.removeItem('accessToken')
+    location.reload()
+}, 1000000000)
 
 
-listElement.onclick = (event) => {
-    if (event.target.dataset.index) {
-        const index = Number(event.target.dataset.index)
-        const type = event.target.dataset.type
-
-
-        if (type === 'toggle') {
-            tasks[index].is_completed = !tasks[index].is_completed
-
-        } else if (type === 'remove') {
-            // tasks.splice(index, 1) -> delete from db
-        }
-        render()
-    }
-}
-
-function getTaskTemplate(task, index) {
+function getTaskTemplate(task) {
     return `
-    <li>
-        <input type="checkbox" class="btn task-checkbox" data-index="${index}" data-type="toggle" ${task?.is_completed ? 'checked' : ''}>
-        <span class="task-title" style="${task.is_completed ? 'text-decoration: line-through;' : ''}" >${task.title}</span>
-        <button class="btn delete-btn" data-index="${index}" data-type="remove">X</button>
-    </li>
+        <input type="checkbox" class="btn task-checkbox" data-index="${task.id}" data-type="toggle" ${task?.is_completed ? 'checked' : ''}>
+        <span class="task-title" style="${task?.is_completed ? 'completed' : ''}">${task.title}</span>
+        <span class="priority">${'★'.repeat(task.priority)}</span>
+        <button class="btn delete-btn" data-index="${task.id}" data-type="remove">X</button>
     `
 }

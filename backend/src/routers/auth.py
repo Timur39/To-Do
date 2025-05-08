@@ -33,6 +33,7 @@ async def login(
     user_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: sessionDep
 ) -> Token:
+
     user = await AuthService.authenticate_user(db, user_data.username, user_data.password)
     if not user:
         raise HTTPException(

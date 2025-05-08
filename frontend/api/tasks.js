@@ -1,42 +1,59 @@
 import { operateData } from './methods.js'
 
-export function getTasks() {
+export async function getTasks() {
     try {
-        const url = 'http://127.0.0.1:8000/api/tasks/get_all_tasks'
-        const tasks = operateData(url, 'GET', is_protected=true)
-        return tasks
+        let url = 'http://127.0.0.1:8000/api/users/me'
+        const response = await operateData({
+            url: url,
+            method: 'GET',
+            isProtected: true
+        })
+        const usersData = response.ok ? await response.json() : []
+        
+        return usersData ? usersData?.tasks : []
     } catch (error) {
-        console.error('getTasks error:', error);
+        console.error('getTasks error:', error);   
     }
 }
 
-export function addTask() {
+export async function addTask(params = {}) {
     try {
         const url = 'http://127.0.0.1:8000/api/tasks/create_task'
-        params = {}
-        const createdTask = operateData(url, 'POST', params, is_protected=true)
+        const createdTask = await operateData({
+            url: url,
+            method: 'POST',
+            data: params,
+            isProtected: true
+        })
         return createdTask
     } catch (error) {
         console.error('addTask error:', error);
     }
 }
 
-export function deleteTask(taskId) {
+export async function deleteTask(taskId) {
     try {
-        const url = `http://127.0.0.1:8000/api/tasks/delete_task/${taskId}`
-        params = {}
-        const deletedTask = operateData(url, 'DELETE', params, is_protected=true)
+        const url = `http://127.0.0.1:8000/api/tasks/delete_task/${+taskId}`
+        const deletedTask = await operateData({
+            url: url,
+            method: 'DELETE',
+            isProtected: true
+        })
         return deletedTask
     } catch (error) {
         console.error('deleteTask error:', error);
     }
 }
 
-export function updateTask(taskId) {
+export async function updateTask(taskId, params) {
     try {
         const url = `http://127.0.0.1:8000/api/tasks/update_task/${taskId}`
-        params = {}
-        const updatedTask = operateData(url, 'POST', params, is_protected=true)
+        const updatedTask = await operateData({
+            url: url,
+            method: 'POST',
+            data: params,
+            isProtected: true
+        })
         return updatedTask
     } catch (error) {
         console.error('updateTask error:', error);

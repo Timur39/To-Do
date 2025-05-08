@@ -20,14 +20,13 @@ class UserMethods:
     async def get_user_by_email(db: sessionDep, email: str) -> UserRelInDB:
         query = (
             select(UserModel).where(UserModel.email == email)
-            .join(UserModel.tasks)
-            .options(selectinload(UserModel.tasks).load_only(TaskModel.id, TaskModel.title, TaskModel.is_completed, TaskModel.date))
+            # .join(UserModel.tasks)
+            # .options(selectinload(UserModel.tasks).load_only(TaskModel.id, TaskModel.title, TaskModel.is_completed, TaskModel.date))
         )
+
         user = await db.execute(query)
         user = user.scalar()
 
-        if user is None:
-            raise user_not_found_exeption
         return user
 
     # Получаем пользователя по id из БД
@@ -41,8 +40,6 @@ class UserMethods:
         user = await db.execute(query)
         user = user.scalar()
 
-        if user is None:
-            raise user_not_found_exeption
         return user
 
     # Получаем всех пользователей из БД
