@@ -5,10 +5,14 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi.middleware.cors import CORSMiddleware
 from redis import asyncio as aioredis
+from sqladmin import Admin
+from src.db.session import engine
+from src.admin.models import TaskAdmin, UserAdmin
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Подключение кеширования
     redis = aioredis.from_url("redis:///6379")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi_cache")
 
@@ -17,13 +21,18 @@ async def lifespan(app: FastAPI):
     app.include_router(users.router)
     app.include_router(tasks.router)
     app.include_router(db.router)
-    
+
+    # Подключение админки
+    admin = Admin(app, engine, base_url="/admin")
+    admin.add_view(UserAdmin)
+    admin.add_view(TaskAdmin)
+
     yield
 
 app = FastAPI(lifespan=lifespan,
               title="To-do app", 
               summary="To-do application's API",
-              version='0.4.0',
+              version='0.5',
               openapi_prefix='/api',
               )
 
