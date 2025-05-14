@@ -1,0 +1,85 @@
+services:
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    ports:
+      - "9080:9080"
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    privileged: true
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yml
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheusdata:/prometheus
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - grafanadata:/var/lib/grafana
+
+  backend:
+    build: .
+    container_name: backend
+    ports:
+      - "8080:8080"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16
+    container_name: postgres_app
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  redis:
+    image: redis:7
+    container_name: redis_app
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgresdata:
+  grafanadata:
+  prometheusdata:
+
+
+# ab -k -c 5 -n 20000 'http://localhost:8080/' & \
+# ab -k -c 5 -n 2000 'http://localhost:8080/api/users/all_users' & \
+# ab -k -c 5 -n 3000 'http://localhost:8080/api/users/get_user/6' & \
+# ab -k -c 5 -n 5000 'http://localhost:8080/api/tasks/get_task_by_id/99' & \
+# ab -k -c 50 -n 5000 'http://localhost:8080/tasks/get_all_tasks?seconds_sleep=1' & \
+# ab -k -c 50 -n 2000 'http://localhost:8080/tasks/get_user_tasks/6?seconds_sleep=2'

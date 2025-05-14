@@ -8,6 +8,7 @@ from redis import asyncio as aioredis
 from sqladmin import Admin
 from src.db.session import engine
 from src.admin.models import TaskAdmin, UserAdmin
+from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 
 @asynccontextmanager
@@ -46,3 +47,8 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"]
 )
+
+# Подключение логов (Prometheus)
+app.add_middleware(PrometheusMiddleware)
+app.add_route("/metrics", handle_metrics)
+

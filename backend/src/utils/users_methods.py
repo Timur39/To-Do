@@ -44,7 +44,7 @@ class UserMethods:
 
     # Получаем всех пользователей из БД
     @staticmethod
-    async def get_all_users(db: sessionDep) -> UserRelInDB:
+    async def get_all_users(db: sessionDep) -> dict[str, list[UserRelInDB]]:
         # Создаем запрос для выборки всех пользователей
         query = (
             select(UserModel)
@@ -57,8 +57,7 @@ class UserMethods:
 
         if records is None:
             raise user_not_found_exeption
-        result = [UserRelInDB.model_validate(i, from_attributes=True) for i in records]
-        return result
+        return {"users": [UserRelInDB.model_validate(i, from_attributes=True) for i in records]}
 
     # Создаем пользователя
     @staticmethod
@@ -76,11 +75,13 @@ class UserMethods:
 
     # Обновляем данные о пользователе
     @staticmethod
-    async def update_user(user_id: int, new_username: str, db: sessionDep) -> UserBase:
+    async def update_user(db: sessionDep, user_id: int, new_username: str = '', new_roles: str = '') -> UserBase:
         user = await db.get(UserModel, user_id)
         if not user:
             raise user_not_found_exeption
-        user.username = new_username
+        
+        user.username = new_username if new_username else user.username
+        user.roles = new_roles if new_roles else user.roles
         await db.commit()
         return UserBase.model_validate(user, from_attributes=True)
 

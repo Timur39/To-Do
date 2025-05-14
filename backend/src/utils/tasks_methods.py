@@ -67,7 +67,7 @@ class TaskMethods:
 
     # Получить все задачи
     @staticmethod
-    async def get_all_tasks(db: sessionDep) -> list[Task]:
+    async def get_all_tasks(db: sessionDep) -> dict[str, list[Task]]:
         query = (
                 select(TaskModel)
                 .join(TaskModel.user)
@@ -78,11 +78,11 @@ class TaskMethods:
         tasks = await db.execute(query)
         tasks = tasks.unique().scalars().all()   
 
-        return tasks
+        return {"tasks": tasks}
 
     # Получить все задачи конкретного пользователя
     @staticmethod
-    async def get_user_tasks(user_id: int, db: sessionDep) -> list[Task]:
+    async def get_user_tasks(user_id: int, db: sessionDep) -> dict[str, list[Task]]:
         query = (
             select(UserModel).where(UserModel.id == user_id)
             .join(UserModel.tasks)
@@ -96,7 +96,7 @@ class TaskMethods:
         if not result:
             raise task_not_found_exeption
         user_tasks = result[0].tasks
-        return [Task.model_validate(task, from_attributes=True) for task in user_tasks]
+        return {"tasks": [Task.model_validate(task, from_attributes=True) for task in user_tasks]}
         
 
     # Сбросить все задачи
