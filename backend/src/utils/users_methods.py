@@ -1,6 +1,5 @@
 from sqlalchemy import delete, select
-from sqlalchemy.orm import selectinload, contains_eager
-from src.schemas.task import Task
+from sqlalchemy.orm import selectinload
 from src.db.models.user import UserModel
 from src.schemas.user import UserBase, UserCreate, UserRelInDB
 from src.dependencies.db import sessionDep
@@ -20,8 +19,6 @@ class UserMethods:
     async def get_user_by_email(db: sessionDep, email: str) -> UserRelInDB:
         query = (
             select(UserModel).where(UserModel.email == email)
-            # .join(UserModel.tasks)
-            # .options(selectinload(UserModel.tasks).load_only(TaskModel.id, TaskModel.title, TaskModel.is_completed, TaskModel.date))
         )
 
         user = await db.execute(query)
@@ -102,19 +99,3 @@ class UserMethods:
     async def reset_users(db: sessionDep) -> None:
         await db.execute(delete(UserModel.__table__))
         await db.commit()
-
-    # Получаем все задачи пользователя
-    @staticmethod
-    async def get_users_tasks(user_id: int, db: sessionDep) -> list[Task]:
-        query = (
-            select(UserModel).where(UserModel.id == user_id)
-            .options(selectinload(UserModel.tasks))
-        )
-        res = await db.execute(query)
-        result = res.unique().scalars().all()
-        if not result:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail="Users tasks not found")
-        user_tasks = result[0].tasks
-
-        return [Task.model_validate(task, from_attributes=True) for task in user_tasks]

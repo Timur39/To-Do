@@ -7,7 +7,7 @@ from src.utils.tasks_methods import TaskMethods
 
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
-expire_time = 60
+expire_time = 360
 
 @router.post("/create_task", summary="Создать задачу")
 async def create_task_router(task_data: TaskCreate, db: sessionDep, user: authDep_user) -> Task:

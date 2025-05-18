@@ -4,7 +4,6 @@ from src.db.models.task import TaskModel
 from src.db.models.user import UserModel
 from src.schemas.task import Task, TaskCreate, TaskUpdate
 from src.dependencies.db import sessionDep
-from sqlalchemy.orm import joinedload, selectinload
 
 
 task_not_found_exeption = HTTPException(
@@ -30,8 +29,7 @@ class TaskMethods:
     # Получить задачу по id
     @staticmethod
     async def get_task_by_id(task_id: int, db: sessionDep) -> Task:
-        request = await db.execute(select(TaskModel).where(TaskModel.id == task_id))
-        task = request.scalar()
+        task = await db.get(TaskModel, task_id)
         if not task:
             raise task_not_found_exeption
         return task
@@ -70,8 +68,6 @@ class TaskMethods:
     async def get_all_tasks(db: sessionDep) -> dict[str, list[Task]]:
         query = (
                 select(TaskModel)
-                .join(TaskModel.user)
-                .options(joinedload(TaskModel.user).load_only(UserModel.id, UserModel.username))
                 )
         if not await db.scalar(select(TaskModel)):
             raise task_not_found_exeption
@@ -84,20 +80,14 @@ class TaskMethods:
     @staticmethod
     async def get_user_tasks(user_id: int, db: sessionDep) -> dict[str, list[Task]]:
         query = (
-            select(UserModel).where(UserModel.id == user_id)
-            .join(UserModel.tasks)
-            .options(selectinload(UserModel.tasks))
-            # .filter(TaskModel.priority >= 2)
-            # .limit(10)
+            select(TaskModel).where(TaskModel.user_id == user_id)
         )
         res = await db.execute(query)
         result = res.unique().scalars().all()
-
         if not result:
             raise task_not_found_exeption
-        user_tasks = result[0].tasks
-        return {"tasks": [Task.model_validate(task, from_attributes=True) for task in user_tasks]}
         
+        return {"tasks": [Task.model_validate(task, from_attributes=True) for task in result]}
 
     # Сбросить все задачи
     @staticmethod
