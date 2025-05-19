@@ -11,7 +11,7 @@ task_not_found_exeption = HTTPException(
     detail='Задач(а) не найдено(а)'
 )
 
-class TaskMethods:
+class TaskService:
     # Создать задачу 
     @staticmethod
     async def create_task(task_data: TaskCreate, db: sessionDep, user: UserModel) -> Task:

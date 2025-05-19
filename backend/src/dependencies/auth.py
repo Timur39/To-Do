@@ -2,7 +2,7 @@ import jwt
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from src.schemas.auth import TokenData
-from src.utils.users_methods import UserMethods
+from src.services.users import UserService
 from src.db.session import get_async_session
 from src.db.models.user import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +28,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)],
     except jwt.InvalidTokenError:
         raise credentials_exception
 
-    user = await UserMethods.get_user_by_email(db, email=token_data.email) # Получаем пользователя из БД
+    user = await UserService.get_user_by_email(db, email=token_data.email) # Получаем пользователя из БД
 
     if user is None:
         raise credentials_exception

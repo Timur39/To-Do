@@ -13,7 +13,7 @@ user_not_found_exeption = HTTPException(
     detail='User not found'
 )
 
-class UserMethods: 
+class UserService: 
     # Получаем пользователя по email из БД
     @staticmethod
     async def get_user_by_email(db: sessionDep, email: str) -> UserRelInDB:

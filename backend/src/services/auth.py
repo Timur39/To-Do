@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from src.config.settings import settings
 from src.utils.security import verify_password
-from src.utils.users_methods import UserMethods
+from src.services.users import UserService
 
 
 AUTH_SECRET_KEY = settings.AUTH_SECRET_KEY
@@ -28,7 +28,7 @@ class AuthService:
     # Аунтефицируем пользователя
     @staticmethod
     async def authenticate_user(db, email: str, password: str):
-        user = await UserMethods.get_user_by_email(db, email)
+        user = await UserService.get_user_by_email(db, email)
         if not user or not verify_password(password, user.hashed_password):
             return False
         return user

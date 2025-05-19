@@ -7,7 +7,7 @@ from src.schemas.auth import Token
 from src.services.auth import AuthService
 from src.dependencies.db import sessionDep
 from src.config.settings import settings
-from src.utils.users_methods import UserMethods
+from src.services.users import UserService
 
 router = APIRouter(prefix='/auth', tags=["Auth"])
 
@@ -17,12 +17,12 @@ async def register(
     db: sessionDep
 ):
     # Проверка существования пользователя
-    existing_user = await UserMethods.get_user_by_email(db, user_data.email)
+    existing_user = await UserService.get_user_by_email(db, user_data.email)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Создание пользователя
-    user = await UserMethods.create_user(user_data, db)
+    user = await UserService.create_user(user_data, db)
     
     raise HTTPException(status_code=status.HTTP_201_CREATED,
                         detail=user)
