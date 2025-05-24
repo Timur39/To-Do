@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.schemas.task import Task, TaskCreate, TaskUpdate
+from src.schemas.task import Task, TaskCreate, TaskInBD, TaskUpdate
 from src.dependencies.auth import authDep_user, authDep_admin
 from src.dependencies.db import sessionDep
 from fastapi_cache.decorator import cache
@@ -9,22 +9,25 @@ from src.services.tasks import TaskService
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 expire_time = 360
 
+
 @router.post("/create_task", summary="Создать задачу")
-async def create_task_router(task_data: TaskCreate, db: sessionDep, user: authDep_user) -> Task:
+async def create_task_router(
+    task_data: TaskCreate, db: sessionDep, user: authDep_user
+) -> Task:
     created_task = await TaskService.create_task(task_data, db, user)
     return created_task
 
 
 @router.get("/get_task_by_id/{task_id}", summary="Получить задачу по id")
 @cache(expire=expire_time)
-async def get_task_by_id_router(task_id: int, db: sessionDep) -> Task:
+async def get_task_by_id_router(task_id: int, db: sessionDep) -> TaskInBD:
     task = await TaskService.get_task_by_id(task_id, db)
-    return task 
+    return task
 
 
 @router.get("/get_all_tasks", summary="Получить все задачи")
 @cache(expire=expire_time)
-async def get_all_tasks_router(db: sessionDep) -> list[Task]:
+async def get_all_tasks_router(db: sessionDep) -> dict[str, list[Task]]:
     all_tasks = await TaskService.get_all_tasks(db)
     return all_tasks
 
@@ -44,7 +47,9 @@ async def delete_task_router(task_id: int, db: sessionDep, user: authDep_user) -
 
 
 @router.put("/update_task/{task_id}", summary="Обновить задачу по id")
-async def update_task_router(task_id: int, new_data: TaskUpdate, db: sessionDep) -> Task:
+async def update_task_router(
+    task_id: int, new_data: TaskUpdate, db: sessionDep
+) -> Task:
     updated_task = await TaskService.update_task_by_id(task_id, new_data, db)
     return updated_task
 
@@ -52,5 +57,4 @@ async def update_task_router(task_id: int, new_data: TaskUpdate, db: sessionDep)
 @router.post("/reset_tasks", summary="Сбросить все задачи")
 async def reset_tasks_router(db: sessionDep, user: authDep_admin) -> dict[str, str]:
     await TaskService.reset_tasks(db)
-    return {'status': 'Tasks was successfully reset'}
-
+    return {"status": "Tasks was successfully reset"}

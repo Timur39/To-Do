@@ -18,4 +18,3 @@ class UserModel(Base):
     )
 
     repr_cols_num = 5
-

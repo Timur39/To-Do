@@ -11,29 +11,36 @@ from src.services.auth import oauth2_scheme
 
 
 # Получаем текущего пользователя
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], 
-                           db: AsyncSession = Depends(get_async_session)) -> UserModel:
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: AsyncSession = Depends(get_async_session),
+) -> UserModel:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(jwt=token, key=settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM])  # Декодируем полученный токен
+        payload = jwt.decode(
+            jwt=token, key=settings.AUTH_SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )  # Декодируем полученный токен
         email = payload.get("sub")  # Получаем id из декодируемых данных
         if email is None:
             raise credentials_exception
-        token_data = TokenData(email=email) # Преобразуем даннык в pydantic схему 
+        token_data = TokenData(email=email)  # Преобразуем даннык в pydantic схему
 
     except jwt.InvalidTokenError:
         raise credentials_exception
 
-    user = await UserService.get_user_by_email(db, email=token_data.email) # Получаем пользователя из БД
+    user = await UserService.get_user_by_email(
+        db, email=token_data.email
+    )  # Получаем пользователя из БД
 
     if user is None:
         raise credentials_exception
-    
+
     return user
+
 
 # Получаем текущего активного пользователя
 async def get_current_active_user(
@@ -42,6 +49,7 @@ async def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
 
 # Получаем текущего администратора
 async def get_current_admin(

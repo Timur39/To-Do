@@ -1,7 +1,8 @@
 from datetime import datetime
-from sqlalchemy import ForeignKey, CheckConstraint, Index
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.db.session import Base
+
 
 class TaskModel(Base):
     __tablename__ = "tasks"

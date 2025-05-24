@@ -13,9 +13,7 @@ engine = create_async_engine(
 )
 
 async_session_maker = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False
+    bind=engine, class_=AsyncSession, expire_on_commit=False
 )
 
 
@@ -25,12 +23,11 @@ class Base(DeclarativeBase):
         server_default=text("TIMEZONE('utc', now())")
     )
     updated_at: Mapped[datetime.datetime] = mapped_column(
-        server_default=text("TIMEZONE('utc', now())"), 
-        onupdate=func.now()
+        server_default=text("TIMEZONE('utc', now())"), onupdate=func.now()
     )
     repr_cols_num = 3
     repr_cols = tuple()
-    
+
     def __repr__(self):
         """Relationships не используются в repr(), т.к. могут вести к неожиданным подгрузкам"""
         cols = []
@@ -40,7 +37,7 @@ class Base(DeclarativeBase):
 
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
 
+
 async def get_async_session():
     async with async_session_maker() as session:
         yield session
-

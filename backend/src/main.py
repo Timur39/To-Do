@@ -27,28 +27,33 @@ async def lifespan(app: FastAPI):
     admin = Admin(app, engine, base_url="/admin")
     admin.add_view(UserAdmin)
     admin.add_view(TaskAdmin)
-
     yield
 
-app = FastAPI(lifespan=lifespan,
-              title="To-do app", 
-              summary="To-do application's API",
-              version='0.5',
-              openapi_prefix='/api',
-              )
+
+app = FastAPI(
+    lifespan=lifespan,
+    title="To-do app",
+    summary="To-do application's API",
+    version="0.5",
+    openapi_prefix="/api",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost", 
-                   "http://127.0.0.1:3000", "http://127.0.0.1",
-                   "http://127.0.0.1:5500", "http://localhost:5500"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ],
     allow_credentials=True,
     allow_methods=["GET", "PUT", "POST", "DELETE"],
     allow_headers=["*"],
-    expose_headers=["*"]
+    expose_headers=["*"],
 )
 
 # Подключение логов (Prometheus)
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
-
