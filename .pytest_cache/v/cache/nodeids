@@ -1,0 +1,8 @@
+[
+  "backend/tests/unit_tests/api_tests/test_tasks.py::TestTasks::test_create_task",
+  "backend/tests/unit_tests/api_tests/test_tasks.py::TestTasks::test_get_all_tasks",
+  "backend/tests/unit_tests/api_tests/test_tasks.py::TestTasks::test_get_task_by_id",
+  "backend/tests/unit_tests/api_tests/test_tasks.py::test_create_task",
+  "backend/tests/unit_tests/api_tests/test_tasks.py::test_get_all_tasks",
+  "backend/tests/unit_tests/api_tests/test_tasks.py::test_get_task_by_id"
+]

@@ -12,7 +12,7 @@ class Task(BaseModel):
 
 class TaskCreate(BaseModel):
     title: str
-    description: str = None
+    description: str = ''
     priority: int = 0
     is_completed: bool = False
     date: date

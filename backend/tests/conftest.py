@@ -1,18 +1,9 @@
+import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
-import pytest_asyncio
 from src.dependencies.auth import get_current_user
-from src.services.db import DBService
-from src.config.settings import settings
 from src.main import app as main_app
 from src.db.session import async_session_maker, engine, get_async_session
-from src.schemas.user import UserCreate
-
-
-@pytest_asyncio.fixture(scope="session", autouse=True)
-async def setup_db():
-    assert settings.MODE == "TEST"
-    await DBService.setup_database()
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -27,7 +18,6 @@ async def db():
 @pytest_asyncio.fixture
 async def app():
     async with LifespanManager(main_app) as manager:
-        print("We're in!")
         yield manager.app
 
 
@@ -38,7 +28,6 @@ async def client(app, db):
     async with AsyncClient(
         transport=ASGITransport(app), base_url="http://test"
     ) as client:
-        print("Client is ready")
         yield client
 
     main_app.dependency_overrides.clear()
@@ -55,19 +44,18 @@ async def test_token(client):
             "password": "123",
         },
     )
-
     login = await client.post(
         "/api/auth/login", data={"username": "user@example.com", "password": "123"}
     )
     token = login.json().get("access_token")
+
     return token
 
 
-# @pytest_asyncio.fixture
-# async def test_user(test_token, db):
-#     user = await get_current_user(test_token, db)
-    
-#     return UserCreate.model_validate(user, from_attributes=True)
+@pytest_asyncio.fixture
+async def test_user(test_token, db):
+    user = await get_current_user(test_token, db)
+    return user
 
 
 def pytest_addoption(parser):
