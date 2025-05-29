@@ -7,6 +7,7 @@ body {
   color: white;
   background-color: #1e1e1e;
   place-items: center;
+  padding-top: 60px;
 }
 
 form {
@@ -19,7 +20,6 @@ form {
   backdrop-filter: blur(10px);
   box-shadow: 0 0 40px;
   padding: 50px 35px;
-  margin-top: 60px;
   background-color: #262626;
 }
 
@@ -29,7 +29,6 @@ form * {
 
 form h3 {
   font-size: 32px;
-  text-align: center;
 }
 form input {
   margin-bottom: 10px;
