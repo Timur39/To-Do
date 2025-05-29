@@ -1,13 +1,14 @@
 # To-Do list (site)
 
-### Stack:
+### Stack
+
 - **Backend**
   - FastAPI
   - Alembic
   - SQLAlchemy
   - PostgresSQL
 - **Frontend**
-  - React
   - JavaScript
   - HTML & CSS
-  
+
+(My first full-stack application :>)

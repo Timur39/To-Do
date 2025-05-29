@@ -14,17 +14,21 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
 class AuthService:
-    # Создаем access_token 
+    # Создаем access_token
     @staticmethod
     async def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + (expires_delta if expires_delta else timedelta(minutes=15))
+        expire = datetime.now(timezone.utc) + (
+            expires_delta if expires_delta else timedelta(minutes=15)
+        )
 
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(payload=to_encode, key=AUTH_SECRET_KEY, algorithm=ALGORITHM) # Кодируем данные
+        encoded_jwt = jwt.encode(
+            payload=to_encode, key=AUTH_SECRET_KEY, algorithm=ALGORITHM
+        )  # Кодируем данные
 
         return encoded_jwt
-    
+
     # Аунтефицируем пользователя
     @staticmethod
     async def authenticate_user(db, email: str, password: str):

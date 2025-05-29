@@ -94,6 +94,8 @@ networks:
   app_network:
     driver: bridge
 
+
+# TEST BACKEND
 # ab -k -c 5 -n 5000 'http://localhost:8080/api/users/all_users' & \
 # ab -k -c 5 -n 5000 'http://localhost:8080/api/users/get_user/1' & \
 # ab -k -c 5 -n 5000 'http://localhost:8080/api/tasks/get_task_by_id/1' & \
